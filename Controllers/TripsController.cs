@@ -24,5 +24,13 @@ namespace Trips.Controllers {
             }
             return Ok();
         }
+
+        // get the list of trips
+        [HttpGet("[Action]")]
+        public IActionResult GetTrips() {
+            var allTrips = _service.GetAllTrips();
+            // return all trips
+            return Ok(allTrips);
+        }
     }
 }
