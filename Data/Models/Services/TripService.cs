@@ -11,7 +11,10 @@ namespace Trips.Data {
 
         public void DeleteTrip(int tripId)
         {
-            throw new System.NotImplementedException();
+            var trip = Data.Trips.FirstOrDefault(t => t.Id == tripId);
+            if(trip != null) {
+                Data.Trips.Remove(trip);
+            }
         }
 
         public List<Trip> GetAllTrips()
@@ -21,7 +24,8 @@ namespace Trips.Data {
 
         public Trip GetTripById(int tripId)
         {
-            throw new System.NotImplementedException();
+            return Data.Trips.FirstOrDefault(t => t.Id == tripId);
+             
         }
 
         public void UpdateTrip(int tripId, Trip trip)
