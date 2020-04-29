@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Trips.Data;
 
@@ -34,9 +35,16 @@ namespace Trips.Controllers {
         // get the list of trips
         [HttpGet("[Action]")]
         public IActionResult GetTrips() {
-            var allTrips = _service.GetAllTrips();
-            // return all trips
-            return Ok(allTrips);
+            try {
+                //throw new Exception();
+                var allTrips = _service.GetAllTrips();
+                // return all trips
+                return Ok(allTrips);
+            }
+            catch(Exception ex) {
+                return  BadRequest(ex.Message);
+            }
+
         }
 
         [HttpPut("UpdateTrip/{id}")]

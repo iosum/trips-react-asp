@@ -13,6 +13,9 @@ export class Trips extends Component {
       trips: [],
       // check if the data is loaded or not
       loading: true,
+      // add an error state
+      failed: false,
+      error: ''
     };
   }
 
@@ -37,8 +40,18 @@ export class Trips extends Component {
       // get all the trips from the data
       const response = result.data;
       // change the trip state to response, and close the loading
-      this.setState({ trips: response, loading: false });
+      this.setState({ trips: response, loading: false, failed: false, error: '' });
+    })
+    .catch(e => {
+      this.setState({
+        trips: [],
+        loading: false,
+        failed: true,
+        error: "Trips couldn't be loaded."
+      });
+
     });
+
 
     // change the state of the trips to that result
   }
@@ -104,10 +117,17 @@ export class Trips extends Component {
       <p>
         <em>Loading...</em>
       </p>
+    ) : // check if there is an error
+    this.state.failed ? (
+      // display the error message
+      <div className="text-danger">
+        <em>{this.state.error}</em>
+      </div>
     ) : (
       // pass the this.state.trips array
       this.renderAllTripsTable(this.state.trips)
     );
+    
 
     return (
       <div>
