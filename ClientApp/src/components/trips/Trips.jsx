@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import axios from "axios";
+import { connect } from "react-redux";
+import { getAllTrips } from "../../actions/tripActions";
 
 export class Trips extends Component {
   // use props to pass data to the view
@@ -15,13 +17,21 @@ export class Trips extends Component {
       loading: true,
       // add an error state
       failed: false,
-      error: ''
+      error: "",
     };
   }
 
   // get the api endpoint, we are going to send a request to get all the trips once the views are loaded
   componentDidMount() {
-    this.populateTripsData();
+    //this.populateTripsData();
+    this.props.getAllTrips();
+  }
+
+  componentDidUpdate(prevProps) {
+    // if the data was updated
+    if (prevProps.trips.data != this.props.trips.data) {
+      this.setState({ trips: this.props.trips.data });
+    }
   }
 
   onTripUpdate(id) {
@@ -34,27 +44,33 @@ export class Trips extends Component {
     history.push("/delete/" + id);
   }
 
-  populateTripsData() {
-    // send a get request to the api endpoint
-    axios.get("api/Trips/GetTrips").then((result) => {
-      // get all the trips from the data
-      const response = result.data;
-      // change the trip state to response, and close the loading
-      this.setState({ trips: response, loading: false, failed: false, error: '' });
-    })
-    .catch(e => {
-      this.setState({
-        trips: [],
-        loading: false,
-        failed: true,
-        error: "Trips couldn't be loaded."
-      });
+  // we are going to use the props to populate the trips data
+  // populateTripsData() {
+  //   // send a get request to the api endpoint
+  //   axios
+  //     .get("api/Trips/GetTrips")
+  //     .then((result) => {
+  //       // get all the trips from the data
+  //       const response = result.data;
+  //       // change the trip state to response, and close the loading
+  //       this.setState({
+  //         trips: response,
+  //         loading: false,
+  //         failed: false,
+  //         error: "",
+  //       });
+  //     })
+  //     .catch((e) => {
+  //       this.setState({
+  //         trips: [],
+  //         loading: false,
+  //         failed: true,
+  //         error: "Trips couldn't be loaded.",
+  //       });
+  //     });
 
-    });
-
-
-    // change the state of the trips to that result
-  }
+  //   // change the state of the trips to that result
+  // }
 
   // use state to render the table
   renderAllTripsTable(trips) {
@@ -113,21 +129,29 @@ export class Trips extends Component {
     // if we haven't got any data yet, we don't want to display an empty table
     // if the state of the loading is true, meaning data haven't returned yet so we need to let the user know that the data is still loading
     // otherwise, we need to create a table to display the info
-    let content = this.state.loading ? (
+    // let content = this.state.loading ? (
+    //   <p>
+    //     <em>Loading...</em>
+    //   </p>
+    // ) : // check if there is an error
+    // this.state.failed ? (
+    //   // display the error message
+    //   <div className="text-danger">
+    //     <em>{this.state.error}</em>
+    //   </div>
+    // ) : (
+    //   // pass the this.state.trips array
+    //   this.renderAllTripsTable(this.state.trips)
+    // );
+
+    let content = this.props.trips.loading ? (
       <p>
         <em>Loading...</em>
       </p>
-    ) : // check if there is an error
-    this.state.failed ? (
-      // display the error message
-      <div className="text-danger">
-        <em>{this.state.error}</em>
-      </div>
     ) : (
-      // pass the this.state.trips array
-      this.renderAllTripsTable(this.state.trips)
+      // if we have some data
+      this.state.trips.length && this.renderAllTripsTable(this.state.trips)
     );
-    
 
     return (
       <div>
@@ -137,3 +161,12 @@ export class Trips extends Component {
     );
   }
 }
+// configure the store
+const mapStateToProps = ({ trips }) => ({
+  trips,
+});
+
+// this will allow the Trips component to access the data from store
+// it connect the store as an augument and uses props to get the app state and the new value
+// since we use the (Trips), change {Trips} to Trips inside App.js
+export default connect(mapStateToProps, { getAllTrips })(Trips);
